@@ -1,21 +1,20 @@
-import { FunctionComponent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import moment from "moment";
 import { io } from "socket.io-client";
 import "./ChatPage.css";
 
 interface ChatRoomProps {}
 
-const ChatRoom: FunctionComponent<ChatRoomProps> = () => {
+const ChatRoom: React.FC<ChatRoomProps> = () => {
 	const [socket, setSocket] = useState<any>(null);
-
 	const [nbrClient, setNbrClient] = useState("");
 	const [nameInput, setNameInput] = useState("");
 	const [messageInput, setMessageInput] = useState("");
-	const [typingFeedback, setTypingFeedback] = useState("");
+	// const [typingFeedback, setTypingFeedback] = useState("");
 
-	const messageInputRef = useRef<HTMLInputElement>(null);
+	// const messageInputRef = useRef<HTMLInputElement>(null);
 
-	const sendMessage = (e: any) => {
+	const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (messageInput === "") return;
 		const data = {
@@ -50,36 +49,32 @@ const ChatRoom: FunctionComponent<ChatRoomProps> = () => {
 	};
 
 	// event listener
+	/*
 	useEffect(() => {
 		const handleFocus = () => {
 			if (socket) {
-				{
-					socket.emit("feedback", {
-						feedback: `✍️ ${nameInput} is typing a message`,
-					});
-				}
+				socket.emit("feedback", {
+					feedback: `✍️ ${nameInput} is typing a message`,
+				});
 			}
 		};
 
 		const handleKeyPress = () => {
 			if (socket) {
-				{
-					socket.emit("feedback", {
-						feedback: `✍️ ${nameInput} is typing a message`,
-					});
-				}
+				socket.emit("feedback", {
+					feedback: `✍️ ${nameInput} is typing a message`,
+				});
 			}
 		};
 
 		const handleBlur = () => {
 			if (socket) {
-				{
-					socket.emit("feedback", {
-						feedback: "",
-					});
-				}
+				socket.emit("feedback", {
+					feedback: "",
+				});
 			}
 		};
+
 		const messageInputField = messageInputRef.current;
 		if (messageInputField) {
 			messageInputField.addEventListener("focus", handleFocus);
@@ -95,13 +90,15 @@ const ChatRoom: FunctionComponent<ChatRoomProps> = () => {
 			}
 		};
 	}, [socket, nameInput]);
+	*/
 
 	// Create single instance of socket to stop infinite socket.id
 	useEffect(() => {
 		const socketInstance = io("http://localhost:8000");
 		setSocket(socketInstance);
+
 		return () => {
-			socketInstance.disconnect(); // Disconnect the socket when the component unmounts
+			socketInstance.disconnect();
 		};
 	}, []);
 
@@ -113,19 +110,8 @@ const ChatRoom: FunctionComponent<ChatRoomProps> = () => {
 			socket.on("chat-message", (data: any) => {
 				displayMessage(false, data);
 			});
-			socket.on("feedback", (data: any) => {
-				setTypingFeedback(data.feedback);
-			});
 			// socket.on("feedback", (data: any) => {
-			// 	const feedback = `<li className="message-feedback">
-			// 	<p className="feedback" id="feedback">
-			// 		${data.feedback} is typing ...
-			// 	</p>
-			// </li>`;
-			// 	const messageContainer = document.getElementById("message-container");
-			// 	if (messageContainer) {
-			// 		messageContainer.innerHTML += feedback;
-			// 	}
+			// 	setTypingFeedback(data.feedback);
 			// });
 		}
 	}, [socket]);
@@ -142,22 +128,18 @@ const ChatRoom: FunctionComponent<ChatRoomProps> = () => {
 							id="name-input"
 							className="name-input"
 							value={nameInput}
-							onChange={(e: any) => setNameInput(e.target.value)}
+							onChange={(e) => setNameInput(e.target.value)}
 							maxLength={20}
 						/>
 					</span>
 				</div>
 				<ul className="message-container" id="message-container">
-					{typingFeedback && (
-						<li className="message-feedback">
+					{/* Render feedback message */}
+					{/* {typingFeedback && (
+						<li className="message-feedback" id="message-feedback">
 							<p className="feedback">{typingFeedback}</p>
 						</li>
-					)}
-					{/* <li className="message-feedback">
-						<p className="feedback" id="feedback">
-							🎈is typing ...
-						</p>
-					</li> */}
+					)} */}
 				</ul>
 				<form className="message-form" id="message-form" onSubmit={sendMessage}>
 					<input
@@ -166,18 +148,19 @@ const ChatRoom: FunctionComponent<ChatRoomProps> = () => {
 						id="message-input"
 						name="message"
 						value={messageInput}
-						onChange={(e: any) => setMessageInput(e.target.value)}
+						onChange={(e) => setMessageInput(e.target.value)}
+						// ref={messageInputRef}
 					/>
 					<div className="v-divid"></div>
 					<button type="submit" className="send-button">
 						Send
-						<span>
+						<span style={{ paddingLeft: "8px" }}>
 							<i className="fas fa-paper-plane"></i>
 						</span>
 					</button>
 				</form>
 				<h3 className="client-total" id="client-total">
-					Totat clients: {nbrClient}
+					Online Users: {nbrClient}
 				</h3>
 			</div>
 		</>

@@ -1,115 +1,118 @@
-import React, { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import { useEffect, useRef, useState } from "react";
 import moment from "moment";
+import { io } from "socket.io-client";
 import "./ChatPage.css";
 
-const ChatPageC: React.FC = () => {
+interface ChatRoomProps {}
+
+const ChatRoom: React.FC<ChatRoomProps> = () => {
+	const [socket, setSocket] = useState<any>(null);
 	const [nbrClient, setNbrClient] = useState("");
 	const [nameInput, setNameInput] = useState("");
 	const [messageInput, setMessageInput] = useState("");
+	const [typingFeedback, setTypingFeedback] = useState("");
 
-	useEffect(() => {
-		const socket = io();
-		socket.on("clients-total", (data) => {
-			setNbrClient(data);
-		});
+	const messageInputRef = useRef<HTMLInputElement>(null);
 
-		socket.on("chat-message", (data) => {
-			const messageTone = new Audio("/message-tone.mp3");
-			messageTone.play();
-			addMessageToUI(false, data);
-		});
-
-		socket.on("feedback", (data) => {
-			clearFeedback();
-			const element = `
-		  <li class="message-feedback">
-			<p class="feedback" id="feedback">${data.feedback}</p>
-		  </li>
-		`;
-			const messageContainer = document.getElementById("message-container");
-			if (messageContainer) {
-				messageContainer.innerHTML += element;
-			}
-		});
-
-		return () => {
-			socket.disconnect();
-		};
-	}, []);
-
-	const addMessageToUI = (isOwnMessage: boolean, data: any) => {
-		clearFeedback();
-		const element = `
-		<li class="${isOwnMessage ? "message-right" : "message-left"}">
-		  <p class="message">
-			${data.message}
-			<span>${data.name} ● ${moment(data.dateTime).fromNow()}</span>
-		  </p>
-		</li>
-	  `;
-		const messageContainer = document.getElementById("message-container");
-		if (messageContainer) {
-			messageContainer.innerHTML += element;
-			scrollToBottom();
-		}
-	};
-
-	const clearFeedback = () => {
-		const feedbackElements = document.querySelectorAll("li.message-feedback");
-		feedbackElements.forEach((element) => {
-			element.parentNode?.removeChild(element);
-		});
-	};
-
-	const scrollToBottom = () => {
-		const messageContainer = document.getElementById("message-container");
-		if (messageContainer) {
-			messageContainer.scrollTo(0, messageContainer.scrollHeight);
-		}
-	};
-
-	const sendMessage = () => {
+	const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
 		if (messageInput === "") return;
-
 		const data = {
 			name: nameInput,
 			message: messageInput,
 			dateTime: new Date(),
 		};
-
-		const socket = io();
 		socket.emit("message", data);
-		addMessageToUI(true, data);
-
+		displayMessage(true, data);
 		setMessageInput("");
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		sendMessage();
+	const displayMessage = (isOwnMessage: boolean, data: any) => {
+		const element = `
+	<li class="${isOwnMessage ? "message-right" : "message-left"}">
+	  <p class="message">
+		${data.message}
+		<span>${data.name} ● ${moment(data.dateTime).fromNow()}</span>
+	  </p>
+	</li>
+  `;
+		const messageContainer = document.getElementById("message-container");
+		if (messageContainer) {
+			messageContainer.innerHTML += element;
+		}
+		scrollToBottom();
 	};
 
-	const handleFocus = () => {
-		const socket = io();
-		socket.emit("feedback", {
-			feedback: `✍️ ${nameInput} is typing a message`,
-		});
+	const scrollToBottom = () => {
+		const messageContainer = document.getElementById("message-container");
+		messageContainer?.scroll(0, messageContainer.scrollHeight);
 	};
 
-	const handleKeyPress = () => {
-		const socket = io();
-		socket.emit("feedback", {
-			feedback: `✍️ ${nameInput} is typing a message`,
-		});
-	};
+	// event listener
+	useEffect(() => {
+		const handleFocus = () => {
+			if (socket) {
+				socket.emit("feedback", {
+					feedback: `✍️ ${nameInput} is typing a message`,
+				});
+			}
+		};
 
-	const handleBlur = () => {
-		const socket = io();
-		socket.emit("feedback", {
-			feedback: "",
-		});
-	};
+		const handleKeyPress = () => {
+			if (socket) {
+				socket.emit("feedback", {
+					feedback: `✍️ ${nameInput} is typing a message`,
+				});
+			}
+		};
+
+		const handleBlur = () => {
+			if (socket) {
+				socket.emit("feedback", {
+					feedback: "",
+				});
+			}
+		};
+
+		const messageInputField = messageInputRef.current;
+		if (messageInputField) {
+			messageInputField.addEventListener("focus", handleFocus);
+			messageInputField.addEventListener("keypress", handleKeyPress);
+			messageInputField.addEventListener("blur", handleBlur);
+		}
+
+		return () => {
+			if (messageInputField) {
+				messageInputField.removeEventListener("focus", handleFocus);
+				messageInputField.removeEventListener("keypress", handleKeyPress);
+				messageInputField.removeEventListener("blur", handleBlur);
+			}
+		};
+	}, [socket, nameInput]);
+
+	// Create single instance of socket to stop infinite socket.id
+	useEffect(() => {
+		const socketInstance = io("http://localhost:8000");
+		setSocket(socketInstance);
+
+		return () => {
+			socketInstance.disconnect();
+		};
+	}, []);
+
+	useEffect(() => {
+		if (socket) {
+			socket.on("client-total", (data: any) => {
+				setNbrClient(data);
+			});
+			socket.on("chat-message", (data: any) => {
+				displayMessage(false, data);
+			});
+			socket.on("feedback", (data: any) => {
+				setTypingFeedback(data.feedback);
+			});
+		}
+	}, [socket]);
 
 	return (
 		<>
@@ -122,21 +125,21 @@ const ChatPageC: React.FC = () => {
 							type="text"
 							id="name-input"
 							className="name-input"
-							// defaultValue="anonymous"
-							maxLength={20}
 							value={nameInput}
 							onChange={(e) => setNameInput(e.target.value)}
+							maxLength={20}
 						/>
 					</span>
 				</div>
 				<ul className="message-container" id="message-container">
-					{/* Existing messages */}
+					{/* Render feedback message */}
+					{typingFeedback && (
+						<li className="message-feedback">
+							<p className="feedback">{typingFeedback}</p>
+						</li>
+					)}
 				</ul>
-				<form
-					className="message-form"
-					id="message-form"
-					onSubmit={handleSubmit}
-				>
+				<form className="message-form" id="message-form" onSubmit={sendMessage}>
 					<input
 						type="text"
 						className="message-input"
@@ -144,9 +147,7 @@ const ChatPageC: React.FC = () => {
 						name="message"
 						value={messageInput}
 						onChange={(e) => setMessageInput(e.target.value)}
-						onFocus={handleFocus}
-						onKeyPress={handleKeyPress}
-						onBlur={handleBlur}
+						ref={messageInputRef} // Use the ref here
 					/>
 					<div className="v-divid"></div>
 					<button type="submit" className="send-button">
@@ -163,4 +164,5 @@ const ChatPageC: React.FC = () => {
 		</>
 	);
 };
-export default ChatPageC;
+
+export default ChatRoom;
