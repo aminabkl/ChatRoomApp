@@ -10,8 +10,9 @@ const ChatRoom: React.FC<ChatRoomProps> = () => {
 	const [nbrClient, setNbrClient] = useState("");
 	const [nameInput, setNameInput] = useState("");
 	const [messageInput, setMessageInput] = useState("");
-	// const [typingFeedback, setTypingFeedback] = useState("");
 
+	// feedback
+	// const [typingFeedback, setTypingFeedback] = useState("");
 	// const messageInputRef = useRef<HTMLInputElement>(null);
 
 	const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
@@ -48,6 +49,7 @@ const ChatRoom: React.FC<ChatRoomProps> = () => {
 		messageContainer?.scroll(0, messageContainer.scrollHeight);
 	};
 
+	// feedback
 	// event listener
 	/*
 	useEffect(() => {
@@ -134,7 +136,7 @@ const ChatRoom: React.FC<ChatRoomProps> = () => {
 					</span>
 				</div>
 				<ul className="message-container" id="message-container">
-					{/* Render feedback message */}
+					{/* feedback*/}
 					{/* {typingFeedback && (
 						<li className="message-feedback" id="message-feedback">
 							<p className="feedback">{typingFeedback}</p>
