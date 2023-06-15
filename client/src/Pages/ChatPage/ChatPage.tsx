@@ -1,18 +1,134 @@
-import React, { useEffect, useState } from "react";
+import { FunctionComponent, useEffect, useRef, useState } from "react";
+import moment from "moment";
 import { io } from "socket.io-client";
 import "./ChatPage.css";
 
-const ChatRoom: React.FC = () => {
+interface ChatRoomProps {}
+
+const ChatRoom: FunctionComponent<ChatRoomProps> = () => {
+	const [socket, setSocket] = useState<any>(null);
+
 	const [nbrClient, setNbrClient] = useState("");
+	const [nameInput, setNameInput] = useState("");
+	const [messageInput, setMessageInput] = useState("");
+	const [typingFeedback, setTypingFeedback] = useState("");
+
+	const messageInputRef = useRef<HTMLInputElement>(null);
+
+	const sendMessage = (e: any) => {
+		e.preventDefault();
+		if (messageInput === "") return;
+		const data = {
+			name: nameInput,
+			message: messageInput,
+			dateTime: new Date(),
+		};
+		socket.emit("message", data);
+		displayMessage(true, data);
+		setMessageInput("");
+	};
+
+	const displayMessage = (isOwnMessage: boolean, data: any) => {
+		const element = `
+	<li class="${isOwnMessage ? "message-right" : "message-left"}">
+	  <p class="message">
+		${data.message}
+		<span>${data.name} ● ${moment(data.dateTime).fromNow()}</span>
+	  </p>
+	</li>
+  `;
+		const messageContainer = document.getElementById("message-container");
+		if (messageContainer) {
+			messageContainer.innerHTML += element;
+		}
+		scrollToBottom();
+	};
+
+	const scrollToBottom = () => {
+		const messageContainer = document.getElementById("message-container");
+		messageContainer?.scroll(0, messageContainer.scrollHeight);
+	};
+
+	// event listener
 	useEffect(() => {
-		const socket = io("http://localhost:8000");
-		socket.on("client-total", (data) => {
-			setNbrClient(data);
-		});
+		const handleFocus = () => {
+			if (socket) {
+				{
+					socket.emit("feedback", {
+						feedback: `✍️ ${nameInput} is typing a message`,
+					});
+				}
+			}
+		};
+
+		const handleKeyPress = () => {
+			if (socket) {
+				{
+					socket.emit("feedback", {
+						feedback: `✍️ ${nameInput} is typing a message`,
+					});
+				}
+			}
+		};
+
+		const handleBlur = () => {
+			if (socket) {
+				{
+					socket.emit("feedback", {
+						feedback: "",
+					});
+				}
+			}
+		};
+		const messageInputField = messageInputRef.current;
+		if (messageInputField) {
+			messageInputField.addEventListener("focus", handleFocus);
+			messageInputField.addEventListener("keypress", handleKeyPress);
+			messageInputField.addEventListener("blur", handleBlur);
+		}
+
 		return () => {
-			socket.disconnect();
+			if (messageInputField) {
+				messageInputField.removeEventListener("focus", handleFocus);
+				messageInputField.removeEventListener("keypress", handleKeyPress);
+				messageInputField.removeEventListener("blur", handleBlur);
+			}
+		};
+	}, [socket, nameInput]);
+
+	// Create single instance of socket to stop infinite socket.id
+	useEffect(() => {
+		const socketInstance = io("http://localhost:8000");
+		setSocket(socketInstance);
+		return () => {
+			socketInstance.disconnect(); // Disconnect the socket when the component unmounts
 		};
 	}, []);
+
+	useEffect(() => {
+		if (socket) {
+			socket.on("client-total", (data: any) => {
+				setNbrClient(data);
+			});
+			socket.on("chat-message", (data: any) => {
+				displayMessage(false, data);
+			});
+			socket.on("feedback", (data: any) => {
+				setTypingFeedback(data.feedback);
+			});
+			// socket.on("feedback", (data: any) => {
+			// 	const feedback = `<li className="message-feedback">
+			// 	<p className="feedback" id="feedback">
+			// 		${data.feedback} is typing ...
+			// 	</p>
+			// </li>`;
+			// 	const messageContainer = document.getElementById("message-container");
+			// 	if (messageContainer) {
+			// 		messageContainer.innerHTML += feedback;
+			// 	}
+			// });
+		}
+	}, [socket]);
 
 	return (
 		<>
@@ -25,39 +141,32 @@ const ChatRoom: React.FC = () => {
 							type="text"
 							id="name-input"
 							className="name-input"
-							defaultValue="anonymous"
+							value={nameInput}
+							onChange={(e: any) => setNameInput(e.target.value)}
 							maxLength={20}
 						/>
 					</span>
 				</div>
 				<ul className="message-container" id="message-container">
-					<li className="message-left">
-						<p className="message">
-							Hello
-							<span>&nbsp;bluebird • 15 June 14:30</span>
-						</p>
-					</li>
-					<li className="message-right">
-						<p className="message">
-							Lorem ipsum dolor sit, amet consectetur adipisicing elit. Possimus
-							facere commodi libero delectus, aut ab! Debitis natus, porro ea
-							maxime rerum fugit, necessitatibus et modi nemo molestiae harum
-							voluptatibus. Nam?
-							<span>&nbsp;bluebird • 15 June 14:30</span>
-						</p>
-					</li>
-					<li className="message-feedback">
+					{typingFeedback && (
+						<li className="message-feedback">
+							<p className="feedback">{typingFeedback}</p>
+						</li>
+					)}
+					{/* <li className="message-feedback">
 						<p className="feedback" id="feedback">
 							🎈is typing ...
 						</p>
-					</li>
+					</li> */}
 				</ul>
-				<form className="message-form" id="message-form">
+				<form className="message-form" id="message-form" onSubmit={sendMessage}>
 					<input
 						type="text"
 						className="message-input"
 						id="message-input"
 						name="message"
+						value={messageInput}
+						onChange={(e: any) => setMessageInput(e.target.value)}
 					/>
 					<div className="v-divid"></div>
 					<button type="submit" className="send-button">
