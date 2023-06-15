@@ -1,37 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 import "./ChatPage.css";
 
 const ChatRoom: React.FC = () => {
-	/*
-	const [messages, setMessages] = useState<string[]>([]);
-	const [messageInput, setMessageInput] = useState("");
-
+	const [nbrClient, setNbrClient] = useState("");
 	useEffect(() => {
-		const socket = new WebSocket("ws://localhost:8080");
-
-		socket.onmessage = (event) => {
-			const fileReader = new FileReader();
-			fileReader.onload = () => {
-				const message = fileReader.result as string;
-				setMessages((prevMessages) => [...prevMessages, message]);
-			};
-			fileReader.readAsText(event.data);
-		};
-
+		const socket = io("http://localhost:8000");
+		socket.on("client-total", (data) => {
+			setNbrClient(data);
+		});
 		return () => {
-			socket.close();
+			socket.disconnect();
 		};
 	}, []);
-
-	const sendMessage = () => {
-		const socket = new WebSocket("ws://localhost:8080");
-		socket.onopen = () => {
-			socket.send(messageInput);
-			socket.close();
-		};
-		setMessageInput("");
-	};
-	*/
 
 	return (
 		<>
@@ -44,7 +25,7 @@ const ChatRoom: React.FC = () => {
 							type="text"
 							id="name-input"
 							className="name-input"
-							value="anonymous"
+							defaultValue="anonymous"
 							maxLength={20}
 						/>
 					</span>
@@ -87,7 +68,7 @@ const ChatRoom: React.FC = () => {
 					</button>
 				</form>
 				<h3 className="client-total" id="client-total">
-					Totat clients: 2
+					Totat clients: {nbrClient}
 				</h3>
 			</div>
 		</>
