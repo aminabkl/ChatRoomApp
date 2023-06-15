@@ -93,7 +93,6 @@ const ChatRoom: React.FC<ChatRoomProps> = () => {
 		};
 	}, [socket, nameInput]);
 	*/
-
 	// Create single instance of socket to stop infinite socket.id
 	useEffect(() => {
 		const socketInstance = io("http://localhost:8000");
