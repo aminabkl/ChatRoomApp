@@ -1,0 +1,167 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap");
+#join {
+	width: 405px !important;
+	height: 670px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	/* margin-top: 18rem; */
+	margin-top: 2rem;
+	font-family: "Open Sans", sans-serif;
+	border-radius: 4px;
+	box-shadow: 0 0 8px #95979d;
+}
+#join-h4 {
+	padding: 30px 0 20px;
+	color: #404145;
+	font-size: 24px;
+	font-weight: 700;
+}
+
+.join-form-div {
+	padding: 0 36px;
+}
+.join-form {
+	display: block;
+}
+
+.form-separator {
+	height: 18px;
+	margin: 10px 0 30px;
+	text-align: center;
+	border-bottom: 1px solid #e4e5e7;
+}
+.form-separator-span {
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 33px;
+	text-transform: uppercase;
+	padding: 0 8px;
+	background-color: #fff;
+	color: #62646a;
+}
+/* //// SOCIAL JOIN //// */
+
+.social-joing {
+	text-align: center;
+}
+.join-social-btn {
+	border-radius: 5px;
+	margin: 4px 0;
+	padding: 8px 0 8px 12px;
+	width: 100%;
+	display: inline-flex;
+	align-items: center;
+}
+
+.facebook-join {
+	background-color: #4267b2;
+	border: 1px solid #4267b2;
+	color: white;
+	align-items: center;
+}
+
+.google-join,
+.apple-join {
+	background: #fff;
+	border: 1px solid #e4e5e7;
+	color: #222325;
+}
+.social-join-icon {
+	padding: 0 10px;
+	font-size: 16px;
+}
+.join-span {
+	padding: 0 15px;
+	font-weight: 600;
+	font-size: 16px;
+	display: flex;
+	text-align: center;
+	align-items: center;
+}
+.error-message-join {
+	margin: -9px 0 5px 0;
+	color: red;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+/* //// INPUT JOIN //// */
+.input-field {
+	margin-bottom: 16px;
+	width: 100%;
+	padding: 8px 12px;
+	border: 1px solid #c5c6c9;
+	border-radius: 4px;
+	box-shadow: none;
+	font: inherit;
+	color: #404145;
+	font-size: 16px;
+}
+.join-btn {
+	background-color: #1dbf73;
+	color: white;
+	/* margin-bottom: 16px; */
+	width: 100%;
+	display: inline-block;
+	box-sizing: border-box;
+	position: relative;
+	padding: 12px 24px;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	font-weight: 600;
+	font-size: 16px;
+	line-height: 100%;
+	text-decoration: none;
+	text-align: center;
+}
+.join-btn:hover {
+	background-color: #3da555;
+	color: white;
+}
+.remember-checkbox {
+	margin: 0 0 16px 0;
+}
+
+/* /////////////////// */
+
+#remember-forgot {
+	display: flex;
+	padding: 14px 0 18px;
+	gap: 95px;
+}
+#remember-forgot,
+#join {
+	font-size: 14px;
+	line-height: 21px;
+}
+#remember-checkbox {
+	margin-right: 7px;
+}
+#remember {
+	display: flex;
+	align-items: center;
+}
+#remember-span,
+#not-member {
+	color: #404145;
+}
+
+#forgot-link,
+#signin-now {
+	color: #1dbf73;
+	text-decoration: none;
+	font-weight: 600;
+}
+#Signin {
+	padding: 12px 0;
+	margin: 15px 0;
+	border-top: 1px solid #e4e5e7;
+	display: flex;
+	justify-content: center;
+	text-align: center;
+	align-items: center;
+	gap: 8px;
+}
+
