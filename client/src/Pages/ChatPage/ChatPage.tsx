@@ -1,3 +1,5 @@
+//using the design pattern observer :
+
 import { useEffect, useRef, useState } from "react";
 import moment from "moment";
 import { io } from "socket.io-client";
