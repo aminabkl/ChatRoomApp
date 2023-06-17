@@ -1,11 +1,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap");
 #login {
 	width: 400px !important;
-	height: 575px;
+	height: 350px;
 	/* margin-top: 16rem; */
 	position: absolute;
 	top: 50%;
 	left: 50%;
+	transform: translate(-50%, -50%);
 	transform: translate(-50%, -50%);
 	font-family: "Open Sans", sans-serif;
 
@@ -114,6 +115,7 @@
 .signin-btn:hover {
 	background-color: #3da555;
 	color: white;
+	cursor: pointer;
 }
 .remember-checkbox {
 	margin: 0 0 16px 0;
@@ -122,6 +124,7 @@
 	color: red;
 	font-size: 14px;
 	font-weight: 600;
+	margin-bottom: 10px;
 }
 /* /////////////////// */
 

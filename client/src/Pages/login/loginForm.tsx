@@ -9,11 +9,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../features/action/authSlice";
 
-interface LoginFormProps {
-	onError: (value: boolean) => void;
-}
+interface LoginFormProps {}
 
-const LoginForm: FunctionComponent<LoginFormProps> = ({ onError }) => {
+const LoginForm: FunctionComponent<LoginFormProps> = () => {
 	const navigate = useNavigate();
 	const [data, setData] = useState({
 		email: "",
@@ -24,7 +22,6 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ onError }) => {
 
 	const handleChange = (e: any) => {
 		setError(false);
-		onError(false);
 		const value = e.target.value;
 		setData({
 			...data,
@@ -52,13 +49,12 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ onError }) => {
 							isLogged: true,
 						})
 					);
-					navigate("/");
+					navigate("/chat");
 				}
 			})
 			.catch((error) => {
 				if (error.response.status === 401) {
 					setError(true);
-					onError(true);
 				} else {
 					console.log("An error occurred:", error.message);
 				}
@@ -68,31 +64,6 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ onError }) => {
 		<>
 			<div className="signin-form-div">
 				<form onSubmit={handleSubmit} className="signin-form">
-					{/* Social Signin */}
-					{/* <div className="social-signing">
-						<button className="facebook-signin signin-social-btn">
-							<span className="social-signin-icon">
-								<FontAwesomeIcon icon={faFacebook} />
-							</span>
-							<span className="signin-span">Continue with Facebook</span>
-						</button>
-						<button className="google-signin signin-social-btn">
-							<span className="social-signin-icon">
-								<img src={google} />
-							</span>
-							<span className="signin-span">Continue with Google</span>
-						</button>
-						<button className="apple-signin signin-social-btn">
-							<span className="social-signin-icon">
-								<FontAwesomeIcon icon={faApple} />
-							</span>
-							<span className="signin-span">Continue with Apple</span>
-						</button>
-					</div> */}
-					{/* Form Separator */}
-					<div className="form-separator">
-						<span className="form-separator-span">or</span>
-					</div>
 					{/* Input Signin */}
 					<div className="input-signin">
 						<input
@@ -127,17 +98,6 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ onError }) => {
 						<button type="submit" className="signin-btn">
 							Continue
 						</button>
-						<div id="remember-forgot">
-							<div id="remember">
-								<input type="checkbox" name="remember" id="remember-checkbox" />
-								<label id="remember-span">Remember Me</label>
-							</div>
-							<div id="forgot">
-								<Link to="/" id="forgot-link">
-									<span>Forgot Password?</span>
-								</Link>
-							</div>
-						</div>
 					</div>
 				</form>
 			</div>
