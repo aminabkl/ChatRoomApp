@@ -42,7 +42,7 @@ const EmailVerify: FunctionComponent<EmailVerifyProps> = () => {
 							You can now login to your account
 						</p>
 						<button className="email-btn">
-							<Link to="/signin" className="email-home-link">
+							<Link to="/" className="email-home-link">
 								login
 							</Link>
 						</button>

@@ -10,6 +10,7 @@
 	transform: translate(-50%, -50%);
 	font-family: "Open Sans", sans-serif;
 
+	background-color: white;
 	border-radius: 4px;
 	box-shadow: 0 0 8px #95979d;
 }

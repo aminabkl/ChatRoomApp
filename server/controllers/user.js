@@ -28,7 +28,6 @@ exports.join = (req, res, next) => {
 				// Send verification email
 				const verificationLink = `${process.env.BASE_URL}${user._id}/verify/${savedEmailToken.emailToken}`;
 				sendEmail(user.email, "Email Verification", verificationLink);
-
 				res.status(201).json({
 					emailVerification:
 						"An email was sent to your account please verify it",
@@ -76,8 +75,6 @@ exports.signin = (req, res, next) => {
 					const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
 						expiresIn: process.env.JWT_EXPIRES_IN,
 					});
-					// res.cookie("userId", user._id, { maxAge: 3600000 });
-					// res.cookie("token", token, { httpOnly: true }, { maxAge: 3600000 });
 					res.cookie("userId", user._id, { maxAge: 259200000 });
 					res.cookie("token", token, { maxAge: 259200000 });
 
@@ -96,6 +93,18 @@ exports.signin = (req, res, next) => {
 		})
 		.catch((error) => {
 			res.status(500).json({
+				error: error,
+			});
+		});
+};
+
+exports.getUser = (req, res, next) => {
+	User.findById(req.params.id)
+		.then((user) => {
+			res.status(200).json(user);
+		})
+		.catch((error) => {
+			res.status(404).json({
 				error: error,
 			});
 		});

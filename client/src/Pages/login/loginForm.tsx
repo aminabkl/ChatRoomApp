@@ -1,24 +1,60 @@
 import { FunctionComponent, useState } from "react";
 import "./login.css";
-import google from "../../assets/socialicons/google.svg";
 import axios from "axios";
 import Cookies from "js-cookie";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faFacebook, faApple } from "@fortawesome/free-brands-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../features/action/authSlice";
 
-interface LoginFormProps {}
+interface LoginFormProps {
+	onSubmit: () => void;
+}
 
-const LoginForm: FunctionComponent<LoginFormProps> = () => {
+interface LoginData {
+	email: string;
+	password: string;
+}
+
+interface Observable {
+	attach: (observer: Observer) => void;
+	detach: (observer: Observer) => void;
+	notify: () => void;
+}
+
+interface Observer {
+	update: () => void;
+}
+
+class LoginFormObservable implements Observable {
+	private observers: Observer[] = [];
+
+	public attach(observer: Observer) {
+		this.observers.push(observer);
+	}
+
+	public detach(observer: Observer) {
+		const index = this.observers.indexOf(observer);
+		if (index !== -1) {
+			this.observers.splice(index, 1);
+		}
+	}
+
+	public notify() {
+		for (const observer of this.observers) {
+			observer.update();
+		}
+	}
+}
+
+const LoginForm: FunctionComponent<LoginFormProps> = ({ onSubmit }) => {
 	const navigate = useNavigate();
-	const [data, setData] = useState({
+	const [data, setData] = useState<LoginData>({
 		email: "",
 		password: "",
 	});
 	const [error, setError] = useState(false);
 	const dispatch = useDispatch();
+	const loginFormObservable = new LoginFormObservable();
 
 	const handleChange = (e: any) => {
 		setError(false);
@@ -31,6 +67,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = () => {
 
 	const handleSubmit = (e: any) => {
 		e.preventDefault();
+		loginFormObservable.notify();
 
 		const userData = {
 			email: data.email,
@@ -42,6 +79,8 @@ const LoginForm: FunctionComponent<LoginFormProps> = () => {
 				if (response.status === 200) {
 					Cookies.set("userId", response.data.userId);
 					Cookies.set("token", response.data.token);
+					console.log(response.data);
+
 					dispatch(
 						login({
 							userId: response.data.userId,
@@ -49,6 +88,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = () => {
 							isLogged: true,
 						})
 					);
+					onSubmit(); // Notify the parent component about the successful login
 					navigate("/chat");
 				}
 			})
@@ -60,6 +100,13 @@ const LoginForm: FunctionComponent<LoginFormProps> = () => {
 				}
 			});
 	};
+
+	loginFormObservable.attach({
+		update: () => {
+			setError(false);
+		},
+	});
+
 	return (
 		<>
 			<div className="signin-form-div">
@@ -110,4 +157,5 @@ const LoginForm: FunctionComponent<LoginFormProps> = () => {
 		</>
 	);
 };
+
 export default LoginForm;

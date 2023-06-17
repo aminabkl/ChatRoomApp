@@ -11,6 +11,7 @@
 	font-family: "Open Sans", sans-serif;
 	border-radius: 4px;
 	box-shadow: 0 0 8px #95979d;
+	background-color: white;
 }
 #join-h4 {
 	padding: 30px 0 20px;
@@ -119,6 +120,7 @@
 .join-btn:hover {
 	background-color: #3da555;
 	color: white;
+	cursor: pointer;
 }
 .remember-checkbox {
 	margin: 0 0 16px 0;
@@ -164,4 +166,3 @@
 	align-items: center;
 	gap: 8px;
 }
-

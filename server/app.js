@@ -1,4 +1,3 @@
-//mongodb connection : mongodb+srv://<username>:<password>@cluster0.uz9idlp.mongodb.net/
 
 const express = require("express");
 const cors = require("cors");
@@ -8,17 +7,9 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const path = require("path");
 
-// const path = require("./uploads")
-
-// const graphqlSchema = require("./graphql/schema");
-// const { graphqlHTTP } = require("express-graphql");
-
 const uri = `mongodb+srv://Hinde:hinde2003@cluster0.uz9idlp.mongodb.net/ChatProject?retryWrites=true&w=majority`;
 
 const userRoutes = require("./routes/user");
-// const serviceRoutes = require("./routes/service");
-// const categoryRoutes = require("./routes/category");
-// const subCategoryRoutes = require("./routes/sub_category");
 const app = express();
 
 mongoose
@@ -48,20 +39,6 @@ app.use((req, res, next) => {
 	);
 	next();
 });
-
-// app.use("/images", express.static(path.join(__dirname, "images")));
-
-// app.use("/api", serviceRoutes);
-// app.use("/api/categories", categoryRoutes);
-// app.use("/api/sub-category", subCategoryRoutes);
-
-// app.use(
-// 	"/graphql",
-// 	graphqlHTTP({
-// 		schema: graphqlSchema,
-// 		graphiql: true,
-// 	})
-// );
 
 app.use("/api", userRoutes);
 

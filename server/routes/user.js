@@ -7,6 +7,7 @@ const EmailTokenDb = require("../models/emailToken");
 
 router.post("/join", userCtrl.join);
 router.post("/signin", userCtrl.signin);
+router.get("/user/:id", userCtrl.getUser);
 
 router.get("/:id/verify/:emailToken", async (req, res) => {
 	try {
