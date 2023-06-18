@@ -11,7 +11,7 @@ interface LoginFormProps {
 }
 
 interface LoginData {
-	email: string;
+	username: string;
 	password: string;
 }
 
@@ -49,7 +49,7 @@ class LoginFormObservable implements Observable {
 const LoginForm: FunctionComponent<LoginFormProps> = ({ onSubmit }) => {
 	const navigate = useNavigate();
 	const [data, setData] = useState<LoginData>({
-		email: "",
+		username: "",
 		password: "",
 	});
 	const [error, setError] = useState(false);
@@ -70,7 +70,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ onSubmit }) => {
 		loginFormObservable.notify();
 
 		const userData = {
-			email: data.email,
+			username: data.username,
 			password: data.password,
 		};
 		axios
@@ -115,11 +115,11 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ onSubmit }) => {
 					<div className="input-signin">
 						<input
 							type="text"
-							name="email"
-							value={data.email}
+							name="username"
+							value={data.username}
 							onChange={handleChange}
 							className="input-field"
-							placeholder="Email"
+							placeholder="Username"
 							style={{
 								border: error ? "1px solid red" : "1px solid #c5c6c9",
 							}}
@@ -139,7 +139,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ onSubmit }) => {
 						/>
 						{error && (
 							<p className="error-message">
-								Wrong email or password, please try again!
+								Wrong username or password, please try again!
 							</p>
 						)}
 						<button type="submit" className="signin-btn">

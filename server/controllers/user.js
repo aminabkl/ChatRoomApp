@@ -42,7 +42,7 @@ exports.join = (req, res, next) => {
 };
 
 exports.signin = (req, res, next) => {
-	User.findOne({ email: req.body.email })
+	User.findOne({ username: req.body.username })
 		.then((user) => {
 			if (!user) {
 				return res.status(401).json({
