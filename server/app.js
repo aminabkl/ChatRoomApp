@@ -1,4 +1,3 @@
-
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -7,7 +6,7 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const path = require("path");
 
-const uri = `mongodb+srv://Hinde:hinde2003@cluster0.uz9idlp.mongodb.net/ChatProject?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.CLUSTER_USERNAME}/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
 const userRoutes = require("./routes/user");
 const app = express();
