@@ -115,12 +115,6 @@ body {
 	text-align: center;
 }
 
-/* .message-form {
-	display: flex;
-	justify-content: space-between;
-	width: 400px;
-} */
-
 .message-form {
 	display: flex;
 	justify-content: space-between;
@@ -162,7 +156,7 @@ body {
 	outline: none;
 	background-color: #1dbf73;
 	cursor: pointer;
-	color: #595a59;
+	color: white;
 	border-radius: 5px;
 }
 
