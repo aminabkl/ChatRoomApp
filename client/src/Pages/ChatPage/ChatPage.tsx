@@ -16,8 +16,14 @@ const ChatRoom: React.FC<ChatRoomProps> = () => {
 	const [nbrClient, setNbrClient] = useState("");
 	const [nameInput, setNameInput] = useState("");
 	const [messageInput, setMessageInput] = useState("");
+
 	const [observateurs, setObservateurs] = useState<ChatMessageObserver[]>([]);
-	const userid = Cookies.get("userId"); // Add this line
+
+	const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+
+	const [userIds, setUserIds] = useState<string[]>([]);
+
+	const userid = Cookies.get("userId");
 
 	const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -88,15 +94,22 @@ const ChatRoom: React.FC<ChatRoomProps> = () => {
 	}, []);
 
 	useEffect(() => {
+		const storedUserIds = localStorage.getItem("userIds");
+		const parsedUserIds = JSON.parse(storedUserIds || "[]");
+		setUserIds(parsedUserIds);
 		if (socket) {
+			socket.emit("user-connect", { userId: userIds });
 			socket.on("client-total", (data: any) => {
 				setNbrClient(data);
 			});
 			socket.on("chat-message", (data: any) => {
 				displayMessage(false, data);
 			});
+			socket.on("online-users", (data: any) => {
+				setOnlineUsers(data.usernames);
+			});
 		}
-	}, [socket]);
+	}, [socket, userid]);
 
 	useEffect(() => {
 		if (userid) {
@@ -118,41 +131,61 @@ const ChatRoom: React.FC<ChatRoomProps> = () => {
 
 	return (
 		<>
-			<h1>iChat 💬</h1>
-			<div className="main">
-				<div className="name">
-					<span>
-						<i className="fas fa-user"></i>
+			<h1 className="ichat-h1">iChat 💬</h1>
+			<div className="body-main">
+				<div className="main">
+					<div className="name">
+						<span>
+							<i className="fas fa-user"></i>
+							<input
+								type="text"
+								id="name-input"
+								className="name-input"
+								defaultValue={nameInput}
+								maxLength={20}
+							/>
+						</span>
+					</div>
+					<ul className="message-container" id="message-container"></ul>
+					<form
+						className="message-form"
+						id="message-form"
+						onSubmit={sendMessage}
+					>
 						<input
 							type="text"
-							id="name-input"
-							className="name-input"
-							defaultValue={nameInput}
-							maxLength={20}
+							className="message-input"
+							id="message-input"
+							name="message"
+							value={messageInput}
+							onChange={(e) => setMessageInput(e.target.value)}
 						/>
-					</span>
+						<div className="v-divid"></div>
+						<button type="submit" className="send-button">
+							Send
+							<span style={{ paddingLeft: "8px" }}>
+								<i className="fas fa-paper-plane"></i>
+							</span>
+						</button>
+					</form>
+					<h3 className="client-total" id="client-total">
+						Online Users: {nbrClient}
+					</h3>
 				</div>
-				<ul className="message-container" id="message-container"></ul>
-				<form className="message-form" id="message-form" onSubmit={sendMessage}>
-					<input
-						type="text"
-						className="message-input"
-						id="message-input"
-						name="message"
-						value={messageInput}
-						onChange={(e) => setMessageInput(e.target.value)}
-					/>
-					<div className="v-divid"></div>
-					<button type="submit" className="send-button">
-						Send
-						<span style={{ paddingLeft: "8px" }}>
-							<i className="fas fa-paper-plane"></i>
-						</span>
-					</button>
-				</form>
-				<h3 className="client-total" id="client-total">
-					Online Users: {nbrClient}
-				</h3>
+				<div className="online-users">
+					<h3 className="online-username">Online Users:</h3>
+					<ul>
+						{onlineUsers.map((user) => (
+							<div className="username-list">
+								<i
+									className="fas fa-user"
+									style={{ color: "#7e7e7e", fontSize: "15px", margin: "6px" }}
+								></i>
+								<li key={user}>{user}</li>
+							</div>
+						))}
+					</ul>
+				</div>
 			</div>
 		</>
 	);

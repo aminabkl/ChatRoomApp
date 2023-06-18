@@ -77,8 +77,15 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ onSubmit }) => {
 			.post("http://localhost:8000/api/signin", userData)
 			.then((response) => {
 				if (response.status === 200) {
-					Cookies.set("userId", response.data.userId);
-					Cookies.set("token", response.data.token);
+					const userId = response.data.userId;
+					const token = response.data.token;
+					const storedUserIds = localStorage.getItem("userIds") || "[]";
+					const userIds = JSON.parse(storedUserIds);
+					userIds.push(userId);
+					localStorage.setItem("userIds", JSON.stringify(userIds));
+
+					Cookies.set("userId", userId);
+					Cookies.set("token", token);
 					console.log(response.data);
 
 					dispatch(

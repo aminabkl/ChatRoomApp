@@ -1,5 +1,5 @@
 const { Server } = require("socket.io");
-const User = require("./models/user"); // Assuming you have a User model
+const User = require("./models/user");
 
 function initializeSocket(server) {
 	const io = new Server(server, {
@@ -10,7 +10,7 @@ function initializeSocket(server) {
 		},
 	});
 
-		let socketsConnected = new Set();
+	let socketsConnected = new Set();
 
 	io.on("connection", async (socket) => {
 		try {
@@ -18,9 +18,21 @@ function initializeSocket(server) {
 			socketsConnected.add(socket.id);
 
 			io.emit("client-total", socketsConnected.size);
+			socket.on("user-connect", async (data) => {
+				const { userId } = data;
+				if (Array.isArray(userId)) {
+					try {
+						const users = await User.find({ _id: { $in: userId } });
+						const usernames = users.map((user) => user.username);
+						io.emit("online-users", { usernames });
+						console.log(usernames);
+					} catch (error) {
+						console.error("Error fetching usernames:", error);
+					}
+				}
+			});
 
 			socket.on("disconnect", () => {
-				console.log("DISCON => ", socket.id);
 				socketsConnected.delete(socket.id);
 				io.emit("client-total", socketsConnected.size);
 			});
